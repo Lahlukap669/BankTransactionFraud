@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction Fraud Detection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .button-container {
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .button-red {
+            background-color: #aa3333;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .button-blue {
+            background-color: #3333aa;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .button-blue:hover {
+            background-color: #4444ff;
+        }
+        .button-red:hover {
+            background-color: #ff4444;
+        }
+        .response {
+            background-color: #f8f8f8;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Transaction Fraud Detection</h1>
+
+    <div class="button-container">
+        <button class="button-red" id="fillFraudValues">Fill Fraud Transaction Values</button>
+        <button id="fillNormalValues">Fill Normal Transaction Values</button>
+        <button class="button-blue" id="submitTransaction">Submit Transaction</button>
+    </div>
+
+    <table id="paramTable">
+        <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- The rows with parameter input fields will go here -->
+        </tbody>
+    </table>
+
+    <div class="response" id="response"></div>
+
+    <script>
+        const fraudTransaction = {
+            "V1": -2.312227,
+            "V2": 1.951992,
+            "V3": -1.609851,
+            "V4": 3.997906,
+            "V5": -0.522188,
+            "V6": -1.426545,
+            "V7": -2.537387,
+            "V8": 1.391657,
+            "V9": -2.770089,
+            "V10": -2.772272,
+            "V11": 3.202033,
+            "V12": -2.899907,
+            "V13": -0.595222,
+            "V14": -4.289254,
+            "V15": 0.389724,
+            "V16": -1.140747,
+            "V17": -2.830056,
+            "V18": -0.016822,
+            "V19": 0.416956,
+            "V20": 0.126911,
+            "V21": 0.517232,
+            "V22": -0.035049,
+            "V23": -0.465211,
+            "V24": 0.320198,
+            "V25": 0.044519,
+            "V26": 0.177840,
+            "V27": 0.261145,
+            "V28": -0.143276,
+            "Amount": 51.0
+        };
+
+        const normalTransaction = {
+            "V1": -1.359807,
+            "V2": -0.072781,
+            "V3": -2.536347,
+            "V4": 1.378155,
+            "V5": -0.338321,
+            "V6": 0.562388,
+            "V7": 0.239599,
+            "V8": 0.198698,
+            "V9": 0.363787,
+            "V10": -1.090794,
+            "V11": -0.751600,
+            "V12": -1.617801,
+            "V13": -0.991390,
+            "V14": -4.311169,
+            "V15": -1.468177,
+            "V16": -0.470401,
+            "V17": 0.207971,
+            "V18": 0.025791,
+            "V19": 0.603993,
+            "V20": 0.251412,
+            "V21": -0.018307,
+            "V22": -0.477838,
+            "V23": -0.110474,
+            "V24": 0.066928,
+            "V25": 0.128539,
+            "V26": -0.291125,
+            "V27": 0.233558,
+            "V28": -0.021053,
+            "Amount": 3.62
+        };
+
+        // Function to render the table with input fields
+        function renderTable(transactionData) {
+            const tableBody = document.getElementById('paramTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // Clear any existing rows
+
+            for (let key in transactionData) {
+                if (transactionData.hasOwnProperty(key)) {
+                    const row = document.createElement('tr');
+                    const cell1 = document.createElement('td');
+                    const cell2 = document.createElement('td');
+
+                    cell1.textContent = key;  // Display parameter name
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.value = transactionData[key];
+                    input.id = key;  // Assign unique ID for each input field
+                    cell2.appendChild(input);
+
+                    row.appendChild(cell1);
+                    row.appendChild(cell2);
+                    tableBody.appendChild(row);
+                }
+            }
+        }
+
+        // Fill inputs with pre-existing values
+        function fillWithValues(transactionData) {
+            for (let key in transactionData) {
+                if (transactionData.hasOwnProperty(key)) {
+                    const inputElement = document.getElementById(key);
+                    inputElement.value = transactionData[key]; // Set value of input to pre-existing value
+                }
+            }
+        }
+
+        // Event listener for Fill Fraud Values button
+        document.getElementById('fillFraudValues').addEventListener('click', () => {
+            renderTable(fraudTransaction);
+        });
+
+        // Event listener for Fill Normal Values button
+        document.getElementById('fillNormalValues').addEventListener('click', () => {
+            renderTable(normalTransaction);
+        });
+
+        // Event listener for Submit Transaction button
+        document.getElementById('submitTransaction').addEventListener('click', async () => {
+            const transactionData = {};
+
+            // Gather all parameter values from the inputs
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                transactionData[input.id] = parseFloat(input.value);
+            });
+
+            try {
+                // Send transaction data to the API (replace URL with actual endpoint)
+                const response = await fetch('https://bank-fraud-0f6192ce8d28.herokuapp.com/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(transactionData)
+                });
+
+                const data = await response.json();
+                document.getElementById('response').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('response').textContent = `Error: ${error.message}`;
+            }
+        });
+
+        // Render table with fraud values by default
+        renderTable(fraudTransaction);
+    </script>
+
+</body>
+</html>

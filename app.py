@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, send_file, send_from_directory
+from flask import Flask, jsonify, request, send_file, send_from_directory, render_template
 import json
 import hashlib
 from flask_cors import CORS
@@ -74,6 +74,10 @@ def index():
                             'probability_of_fraud-1': predicted_probabilities[0][1]})
         
     return jsonify({'error': "GET method not allowed"}), 405
+
+@app.route("/app", methods=['GET', 'POST'])
+def application():
+    return render_template('app.html')
 
 if __name__ == "__main__":
     app.run(debug=True, host='', port=5000)
