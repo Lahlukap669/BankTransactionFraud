@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
 
 app = Flask(__name__)
+CORS(app) # Enable CORS
 
 # load model
 model = load(filename="./randomForestBankTransactionFraud.joblib")
